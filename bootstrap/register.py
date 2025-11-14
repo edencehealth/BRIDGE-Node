@@ -153,9 +153,9 @@ def main():
             public_key=public_key
         )
         logger.info("Registration successful!")
-        logger.info("Assigned ID:", result.get("id"))
-        logger.info("Github repo: ", result.get("github_repo_url"))
-        logger.info("Created at:", result.get("created_at"))
+        logger.info("Assigned ID:", result.id)
+        logger.info("Site:", result.site_name)
+        logger.info("Created at:", result.created_at)
 
     except Exception as e:
         print("Registration failed:", e)
