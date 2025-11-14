@@ -69,7 +69,6 @@ class RegistrationClient:
         return headers
 
     def register_site(self, site_name: str, public_key: str) -> SiteRegistrationResponse:
-        url = f"{self.api_url}/register"
         payload = SiteRegistrationRequest(
             site_name=site_name,
             public_key=public_key
@@ -77,7 +76,7 @@ class RegistrationClient:
 
         try:
             response = requests.post(
-                url,
+                self.api_url,
                 json=payload,
                 headers=self._get_headers(),
                 timeout=self.timeout
@@ -86,7 +85,7 @@ class RegistrationClient:
             logger.error(
                 "Error while calling registration endpoint",
                 extra={
-                    "url": url,
+                    "url": self.api_url,
                     "payload": payload,
                     "exception_type": request_exc.__class__.__name__,
                     "exception": str(request_exc),
@@ -98,7 +97,7 @@ class RegistrationClient:
             logger.error(
                 "Registration API error",
                 extra={
-                    "url": url,
+                    "url": self.api_url,
                     "payload": payload,
                     "status_code": response.status_code,
                     "response_text": response.text,
