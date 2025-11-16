@@ -21,21 +21,29 @@ echo "[INFO] Installing dependencies..."
 if ! command -v python3 >/dev/null 2>&1; then
   echo "[ERROR] Python3 is required but not installed."
   exit 1
+else
+  echo "[INFO] Python3 already installed"
 fi
 
 # Install pip if needed
 if ! command -v pip3 >/dev/null 2>&1; then
   echo "[INFO] Installing pip..."
   sudo apt-get update && sudo apt-get install -y python3-pip
+else
+  echo "[INFO] Pip already installed"
 fi
+
+echo "Starting up virtual environment..."
+python3 -m venv venv
+source venv/bin/activate
 
 # Install python dependencies
 pip3 install --upgrade pip
 if ! command -v ansible-playbook >/dev/null 2>&1; then
   echo "[INFO] Installing Ansible..."
-  pip3 install --user --upgrade ansible requests pydantic
+  pip3 install --upgrade ansible requests pydantic
 else
-  pip3 install --user --upgrade requests pydantic
+  pip3 install --upgrade requests pydantic
 fi
 
 # -----------------------------
