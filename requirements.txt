@@ -1,0 +1,7 @@
+cryptography
+pydantic
+requests
+rich
+typer
+pygithub
+gitpython

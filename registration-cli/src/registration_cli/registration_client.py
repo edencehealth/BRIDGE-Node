@@ -22,6 +22,8 @@ class SiteRegistrationResponse(BaseModel):
     site_name: str
     created_at: datetime
     created_by: str
+    github_repo_name: str
+    github_org_name: str
 
 
 class RegistrationApiError(Exception):
@@ -93,6 +95,7 @@ class RegistrationClient:
             )
             raise
 
+        logger.info(f"RESPONSE TEXT {response.json()}")
         if response.status_code != 201:
             logger.error(
                 "Registration API error",
