@@ -1,7 +1,13 @@
 #!/bin/bash
 set -e
 
-# 1. Install uv if not found
+# Install curl if not found
+if ! command -v curl &> /dev/null; then
+    echo "Installing curl..."
+    sudo apt-get update && sudo apt-get install -y curl
+fi
+
+# Install uv if not found
 if ! command -v uv &> /dev/null; then
     echo "Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -35,11 +41,11 @@ pip3 install --upgrade pip
 pip3 install -r requirements.txt
 
 # 'uv run' will automatically:
-# 3. Run the registration code
+# Run the registration code
 echo "[INFO] Launching BRIDGE Node Registration App..."
 uv run --project registration-cli python -m registration_cli.main register
 
-# 4. Install docker and related packages
+# Install docker and related packages
 echo "[INFO] Installing and setting up docker and related packages..."
 # Add Docker's official GPG key:
 sudo apt update
@@ -63,7 +69,7 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
-# Install ssh and git
+# Install ssh
 echo "[INFO] Installing necessary packages..."
 sudo apt install openssh-server
 service ssh restart
