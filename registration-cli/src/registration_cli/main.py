@@ -1,5 +1,6 @@
 import typer
 import logging
+from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -17,8 +18,10 @@ console = Console()
 
 # Configuration
 APP_CONFIG = config.load_config()
-SSH_KEY_PATH = config.CONFIG_DIR / "id_rsa"
+SSH_KEY_PATH = Path.home() / ".ssh" / "id_rsa"
 DESTINATION_DIR = config.CONFIG_DIR / "ohdsi"
+VOCAB_DIR = DESTINATION_DIR / "vocab"
+OUTPUT_DIR = DESTINATION_DIR / "output"
 
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging to file")):
@@ -148,6 +151,9 @@ def register(
         console.print(f"An unexpected error occurred: {e}")
         console.print(f"[dim]Detailed logs written to : {config.LOG_FILE}[/dim]")
         raise typer.Exit(code=1)
+
+    VOCAB_DIR.mkdir(mode=0o777, parents=False,exist_ok=False)
+    OUTPUT_DIR.mkdir(mode=0o777, parents=False,exist_ok=False)
 
 if __name__ == "__main__":
     app()

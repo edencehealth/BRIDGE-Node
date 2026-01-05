@@ -95,7 +95,6 @@ class RegistrationClient:
             )
             raise
 
-        logger.info(f"RESPONSE TEXT {response.json()}")
         if response.status_code != 201:
             logger.error(
                 "Registration API error",
