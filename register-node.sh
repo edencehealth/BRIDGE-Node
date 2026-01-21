@@ -12,13 +12,16 @@ if ! command -v uv &> /dev/null; then
     echo "Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
     source $HOME/.local/bin/env
-    # source $HOME/.cargo/env
 else
    echo "[INFO] uv already installed"
 fi
 
+# Run the Node registration CLI
 # 'uv run' will automatically:
-# Run the registration code
+#  - Download the correct Python version (if missing)
+#  - Create a virtual environment
+#  - Install dependencies
+#  - Run the registration code
 echo "[INFO] Launching BRIDGE Node Registration App..."
 uv run --project registration-cli python -m registration_cli.main register
 
@@ -46,6 +49,7 @@ fi
 
 sudo groupadd docker
 sudo usermod -aG docker $USER
+sudo systemctl enable docker
 
 # Install ssh
 if ! command -v openssh-server &>/ /dev/null; then
