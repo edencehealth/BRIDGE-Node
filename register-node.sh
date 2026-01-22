@@ -54,7 +54,7 @@ sudo systemctl enable docker
 # Install ssh
 if ! command -v openssh-server &>/ /dev/null; then
     echo "[INFO] Installing necessary packages..."
-    sudo apt install openssh-server
+    sudo apt-get install -y openssh-server
     service ssh restart
 else
     echo "[INFO] openssh-server already installed"
