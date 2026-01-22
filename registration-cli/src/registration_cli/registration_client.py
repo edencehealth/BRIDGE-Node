@@ -22,6 +22,8 @@ class SiteRegistrationResponse(BaseModel):
     site_name: str
     created_at: datetime
     created_by: str
+    github_repo_name: str
+    github_org_name: str
 
 
 class RegistrationApiError(Exception):

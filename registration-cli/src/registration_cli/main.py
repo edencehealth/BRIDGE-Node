@@ -1,5 +1,6 @@
 import typer
 import logging
+from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -9,13 +10,18 @@ from rich import box
 from . import config, crypto, logger
 from .registration_client import RegistrationClient, RegistrationApiError
 
+from git import Repo
+
 # Initialize App
 app = typer.Typer(no_args_is_help=True)
 console = Console()
 
 # Configuration
 APP_CONFIG = config.load_config()
-SSH_KEY_PATH = config.CONFIG_DIR / "id_rsa"
+SSH_KEY_PATH = Path.home() / ".ssh" / "id_rsa"
+DESTINATION_DIR = config.CONFIG_DIR / "ohdsi"
+VOCAB_DIR = DESTINATION_DIR / "vocab"
+OUTPUT_DIR = DESTINATION_DIR / "output"
 
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging to file")):
@@ -106,6 +112,7 @@ def register(
         grid.add_row("Assigned ID:", str(resp.id))
         grid.add_row("Site Name:", resp.site_name)
         grid.add_row("Created At:", created_at_date)
+        grid.add_row("Repo name:", resp.github_repo_name)
 
         console.print(
             Panel(
@@ -117,6 +124,9 @@ def register(
         )
 
         logging.info(f"Registration successful! ID: {resp.id}")
+
+        repo_name= f"git@github.com:{resp.github_org_name}/{resp.github_repo_name}.git"
+        logging.info(f"repo name {repo_name}")
 
     except RegistrationApiError as e:
         console.print(f"\n[bold red]❌ Registration Failed[/bold red]")
@@ -130,7 +140,20 @@ def register(
         console.print(f"[dim]Detailed logs written to : {config.LOG_FILE}[/dim]")
         logging.exception("Unexpected crash in register command")
         raise typer.Exit(code=1)
+    
+    try:
+        with console.status("[bold cyan]Cloning repo...", spinner="earth"):
+         repo = Repo.clone_from(repo_name, DESTINATION_DIR)
+         logging.info(repo)
+         console.print(Panel("Git clone Successful! :tada:", style="bold green", box=box.ROUNDED))
+    except Exception as e:
+        console.print(f"\n[bold red]💥 Unexpected Error[/bold red]")
+        console.print(f"An unexpected error occurred: {e}")
+        console.print(f"[dim]Detailed logs written to : {config.LOG_FILE}[/dim]")
+        raise typer.Exit(code=1)
 
+    VOCAB_DIR.mkdir(mode=0o777, parents=False,exist_ok=False)
+    OUTPUT_DIR.mkdir(mode=0o777, parents=False,exist_ok=False)
 
 if __name__ == "__main__":
     app()

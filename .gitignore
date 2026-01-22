@@ -2,3 +2,4 @@
 *.egg-info
 .python-version
 .idea
+*__pycache__
