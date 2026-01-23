@@ -22,6 +22,8 @@ class SiteRegistrationResponse(BaseModel):
     site_name: str
     created_at: datetime
     created_by: str
+    github_repo_name: str
+    github_org_name: str
 
 
 class RegistrationApiError(Exception):
@@ -52,10 +54,10 @@ class RegistrationClient:
                 "client_secret": self.oidc_client_secret,
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=self.timeout
         )
         token_resp.raise_for_status()
-        access_token = token_resp.json()["access_token"]
-        return access_token
+        return token_resp.json()["access_token"]
 
     def _get_headers(self):
         headers = {
@@ -63,7 +65,7 @@ class RegistrationClient:
             "Content-Type": "application/json",
         }
         access_token = self._get_jwt_access_token()
-        logger.info(f"Access token: {access_token}")
+        logger.debug(f"Access token: {access_token}")
         if access_token:
             headers["Authorization"] = f"Bearer {access_token}"
         return headers

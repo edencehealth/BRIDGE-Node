@@ -1,0 +1,23 @@
+[project]
+name = "bridge-node-registration-cli"
+version = "0.1.0"
+description = "CLI app to register a BRIDGE Node"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=46.0.3",
+    "gitpython>=3.1.45",
+    "pydantic>=2.12.5",
+    "pygithub>=2.8.1",
+    "questionary>=2.1.1",
+    "requests>=2.32.5",
+    "rich>=14.2.0",
+    "shellingham>=1.5.4",
+    "typer>=0.20.0",
+]
+[project.scripts]
+# Command = "Package.Module:Function"
+bridge-node-cli = "registration_cli.main:app"
+
+[tool.uv]
+package = true
