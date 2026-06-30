@@ -18,26 +18,20 @@ There are two audiences for this document:
 - A Linux host (the provisioning script targets Debian/Ubuntu).
 - A **single-use Initial Access Token** from your BRIDGE/Keycloak administrator (see the [admin section](#for-the-central-keycloak-admin-creating-a-single-use-registration-token)). The token is short-lived and can register exactly one node — request a fresh one for each node.
 
-### Option A — full host provisioning (recommended for a new node)
+### Registering the node
 
-From the repository root on the node:
+From the repository root on the node, run the provisioning script:
 
 ```bash
 ./register-node.sh
 ```
 
-This script installs the host prerequisites (`curl`, [`uv`](https://docs.astral.sh/uv/), Docker, OpenSSH server), then launches the registration CLI. When prompted, enter:
+This installs the host prerequisites (`curl`, [`uv`](https://docs.astral.sh/uv/), Docker, OpenSSH server) and runs the registration. When prompted, enter:
 
 1. **Site Name** — a human-readable name for this node.
 2. **Keycloak Initial Access Token** — paste the one-time token from your admin (input is hidden).
 
-### Option B — run the registration CLI directly
-
-If the host is already provisioned, you can run just the CLI:
-
-```bash
-uv run --project registration-cli python -m registration_cli.main register
-```
+This is all that is needed for a new node.
 
 ### What happens during registration
 
@@ -48,15 +42,27 @@ uv run --project registration-cli python -m registration_cli.main register
 
 The issued OIDC credentials are stored at `~/.BRIDGE-Node-Registration-CLI/node-credentials.json` with owner-only (`0600`) permissions. **Re-running `register` reuses these stored credentials and does not require a new Initial Access Token** — the token is only needed the first time.
 
-### Configuration
+### Re-running or reconfiguring (advanced)
 
-By default the CLI targets the production BRIDGE endpoints. To view or change them:
+On an already-provisioned host you can invoke the CLI directly instead of re-running `register-node.sh` (which would also re-run the host provisioning steps). This is useful in a few cases:
 
-```bash
-uv run --project registration-cli python -m registration_cli.main configure
-```
+- **Retry a failed registration** — if a run failed *after* the OIDC client was issued (e.g. a transient server error), just re-run `register`. The issued credentials are persisted, so the retry reuses them and does **not** need a new Initial Access Token:
 
-This manages the registration API URL, the OIDC token URL, and the Keycloak DCR URL, stored in `~/.BRIDGE-Node-Registration-CLI/bridge-node-config.json`. Per-run overrides are also available as `--api-url`, `--token-url`, and `--dcr-url` flags on the `register` command.
+  ```bash
+  uv run --project registration-cli python -m registration_cli.main register
+  ```
+
+- **Change the target endpoints** — by default the CLI targets the production BRIDGE endpoints. View or change the registration API URL, OIDC token URL, and Keycloak DCR URL (stored in `~/.BRIDGE-Node-Registration-CLI/bridge-node-config.json`):
+
+  ```bash
+  uv run --project registration-cli python -m registration_cli.main configure
+  ```
+
+  Per-run overrides are also available as `--api-url`, `--token-url`, and `--dcr-url` flags on `register`.
+
+- **Debugging** — add `-v` for debug-level logging.
+
+(A fresh host still needs `register-node.sh` at least once — that is what installs Docker and OpenSSH.)
 
 ### Troubleshooting
 
