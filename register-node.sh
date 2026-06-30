@@ -36,7 +36,7 @@ if ! command -v docker &> /dev/null; then
     sudo chmod a+r /etc/apt/keyrings/docker.asc
 
     # Add the repository to Apt sources:
-    echo \ 
+    echo \
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
     $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -47,7 +47,7 @@ else
     echo "[INFO] Docker and related packages already installed"
 fi
 
-sudo groupadd docker
+sudo groupadd -f docker
 sudo usermod -aG docker $USER
 sudo systemctl enable docker
 

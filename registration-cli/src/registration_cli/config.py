@@ -10,8 +10,9 @@ LOG_FILE = CONFIG_DIR / "bridge-node-registration.log"
 
 # Default settings
 DEFAULTS = {
-    "api_url": "https://portal.bridge.cloud.edence.health//api/v1/register",
-    "oidc_token_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/protocol/openid-connect/token"
+    "api_url": "https://portal.bridge.cloud.edence.health/api/v1/register",
+    "oidc_token_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/protocol/openid-connect/token",
+    "dcr_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/clients-registrations/openid-connect",
 }
 
 def load_config() -> Dict[str, str]:
@@ -19,7 +20,7 @@ def load_config() -> Dict[str, str]:
     if not CONFIG_FILE.exists():
         return DEFAULTS.copy()
     try:
-        with open(CONFIG_FILE, "r") as f:
+        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             return {**DEFAULTS, **json.load(f)}
     except Exception:
         return DEFAULTS.copy()
@@ -29,5 +30,5 @@ def save_config_value(key: str, value: str):
     current = load_config()
     current[key] = value
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    with open(CONFIG_FILE, "w") as f:
+    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(current, f, indent=4)
