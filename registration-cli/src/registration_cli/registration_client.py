@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 import logging
-import sys
-import platform
-import socket
 import requests
-import uuid
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -65,7 +61,6 @@ class RegistrationClient:
             "Content-Type": "application/json",
         }
         access_token = self._get_jwt_access_token()
-        logger.debug(f"Access token: {access_token}")
         if access_token:
             headers["Authorization"] = f"Bearer {access_token}"
         return headers
@@ -118,49 +113,3 @@ class RegistrationClient:
             return response.json()
         except Exception:
             return None
-
-
-def main():
-    if len(sys.argv) < 7:
-        print("Usage: register.py <api_url> <site_name> <public_key> <oidc_token_url> <oidc_client_id> <oidc_client_secret>", file=sys.stderr)
-        sys.exit(1)
-
-    api_url = sys.argv[1]
-    site_name = sys.argv[2]
-    public_key = sys.argv[3]
-    oidc_token_url = sys.argv[4]
-    oidc_client_id = sys.argv[5]
-    oidc_client_secret = sys.argv[6]
-
-    logger.info(f"Registering site '{site_name} @ '{api_url}")
-    logger.info(f"OIDC token URL: {oidc_token_url}, OIDC client: {oidc_client_id}, OIDC secret: {oidc_client_secret}")
-
-    registration_client = RegistrationClient(
-        api_url=api_url,
-        oidc_token_url=oidc_token_url,
-        oidc_client_id=oidc_client_id,
-        oidc_client_secret=oidc_client_secret)
-
-    # Prepare metadata
-    metadata = {
-        "hostname": socket.gethostname(),
-        "os": platform.system(),
-        "uuid": str(uuid.uuid4()),
-        "public_key": public_key,
-    }
-
-    try:
-        result = registration_client.register_site(
-            site_name=site_name,
-            public_key=public_key
-        )
-        logger.info("Registration successful!")
-        logger.info("Assigned ID:", result.id)
-        logger.info("Site:", result.site_name)
-        logger.info("Created at:", result.created_at)
-
-    except Exception as e:
-        print("Registration failed:", e)
-
-if __name__ == "__main__":
-    main()
