@@ -51,9 +51,12 @@ def register_oidc_client(
 
     data = response.json()
     logger.info("DCR succeeded; issued client_id=%s", data.get("client_id"))
-    return IssuedClientCredentials(
-        client_id=data["client_id"],
-        client_secret=data["client_secret"],
-        registration_access_token=data["registration_access_token"],
-        registration_client_uri=data["registration_client_uri"],
-    )
+    try:
+        return IssuedClientCredentials(
+            client_id=data["client_id"],
+            client_secret=data["client_secret"],
+            registration_access_token=data["registration_access_token"],
+            registration_client_uri=data["registration_client_uri"],
+        )
+    except KeyError as exc:
+        raise DcrError(f"DCR response missing expected field: {exc}") from exc

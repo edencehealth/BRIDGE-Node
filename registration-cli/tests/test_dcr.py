@@ -48,3 +48,14 @@ def test_register_oidc_client_other_error_includes_status(mock_post):
     with pytest.raises(dcr.DcrError) as exc:
         dcr.register_oidc_client(DCR_URL, "iat", "bridge-node-Test")
     assert "400" in str(exc.value)
+
+
+@patch("registration_cli.dcr.requests.post")
+def test_register_oidc_client_malformed_201_raises_dcr_error(mock_post):
+    """201 body missing client_secret must raise DcrError, not KeyError."""
+    incomplete_response = {k: v for k, v in DCR_RESPONSE.items() if k != "client_secret"}
+    mock_post.return_value = MagicMock(status_code=201, json=lambda: incomplete_response)
+
+    with pytest.raises(dcr.DcrError) as exc:
+        dcr.register_oidc_client(DCR_URL, "iat-123", "bridge-node-Test")
+    assert "client_secret" in str(exc.value)

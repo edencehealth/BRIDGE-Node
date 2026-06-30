@@ -87,3 +87,17 @@ def test_reuse_persisted_credentials_skips_dcr(monkeypatch, tmp_path):
     assert result.exit_code == 0, result.output
     assert _FakeClient.kwargs["oidc_client_id"] == "node-cid"
     assert _FakeClient.called_with["public_key"] == "ssh-rsa AAAA test"
+
+
+def test_corrupt_credentials_exits_cleanly(monkeypatch, tmp_path):
+    """A corrupt credentials file must produce a clean exit code 1, not a traceback."""
+    _patch_common(monkeypatch, tmp_path)
+
+    def raise_value_error():
+        raise ValueError("corrupt")
+
+    monkeypatch.setattr(cli_main.credentials, "load", raise_value_error)
+
+    result = runner.invoke(cli_main.app, ["register", "--site-name", "Test Site"])
+
+    assert result.exit_code != 0

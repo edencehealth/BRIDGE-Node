@@ -92,7 +92,13 @@ def register(
         raise typer.Exit(code=1)
 
     # 2. Node OIDC credentials: reuse if present, else register via DCR
-    node_creds = credentials.load()
+    try:
+        node_creds = credentials.load()
+    except Exception:
+        console.print("[bold red]❌ Credentials file appears corrupted.[/bold red]")
+        console.print(f"[dim]Delete {credentials.CREDENTIALS_FILE} and re-run to re-register. Logs: {config.LOG_FILE}[/dim]")
+        logging.exception("Failed to parse credentials file")
+        raise typer.Exit(code=1)
     if node_creds is None:
         iat = typer.prompt("Keycloak Initial Access Token", hide_input=True)
         try:
