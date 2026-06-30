@@ -110,3 +110,13 @@ def test_get_headers_does_not_log_access_token(_mock_token, caplog):
         headers = _client()._get_headers()
     assert headers["Authorization"] == "Bearer supersecret-token"
     assert "supersecret-token" not in caplog.text
+
+
+@patch.object(RegistrationClient, "_get_jwt_access_token", side_effect=ConnectionError("keycloak down"))
+@patch("registration_cli.registration_client.requests.post")
+def test_token_failure_propagates_before_api_call(mock_post, _mock_token):
+    # A token-endpoint failure must surface (not be mislabeled as an API error)
+    # and must short-circuit before the registration POST is attempted.
+    with pytest.raises(ConnectionError):
+        _client().register_site(site_name="Test Site", public_key="ssh-rsa AAAA")
+    mock_post.assert_not_called()

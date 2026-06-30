@@ -71,11 +71,15 @@ class RegistrationClient:
             public_key=public_key
         ).model_dump()
 
+        # Fetch the token/headers before the try so a token-endpoint failure is not
+        # misreported as a registration-endpoint error.
+        headers = self._get_headers()
+
         try:
             response = requests.post(
                 self.api_url,
                 json=payload,
-                headers=self._get_headers(),
+                headers=headers,
                 timeout=self.timeout
             )
         except Exception as request_exc:

@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Optional
 
 from pydantic import BaseModel
@@ -28,11 +29,15 @@ def load() -> Optional[IssuedClientCredentials]:
     """Return the persisted node credentials, or None if not registered yet."""
     if not CREDENTIALS_FILE.exists():
         return None
-    return IssuedClientCredentials(**json.loads(CREDENTIALS_FILE.read_text()))
+    return IssuedClientCredentials(**json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8")))
 
 
 def save(creds: IssuedClientCredentials) -> None:
     """Persist node credentials with owner-only (0600) permissions."""
     config.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    CREDENTIALS_FILE.write_text(creds.model_dump_json(indent=2))
+    # Create the file with 0600 from the start so it is never briefly world-readable.
+    fd = os.open(CREDENTIALS_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with open(fd, "w", encoding="utf-8") as f:
+        f.write(creds.model_dump_json(indent=2))
+    # Tighten perms on a pre-existing file too (O_CREAT does not change existing modes).
     CREDENTIALS_FILE.chmod(0o600)

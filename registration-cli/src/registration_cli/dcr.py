@@ -49,7 +49,11 @@ def register_oidc_client(
         logger.error("DCR error: status=%s body=%s", response.status_code, response.text)
         raise DcrError(f"Error {response.status_code}: {response.text}")
 
-    data = response.json()
+    try:
+        data = response.json()
+    except ValueError as exc:
+        logger.error("DCR returned a non-JSON 201 response")
+        raise DcrError(f"DCR returned a non-JSON response: {exc}") from exc
     logger.info("DCR succeeded; issued client_id=%s", data.get("client_id"))
     try:
         return IssuedClientCredentials(

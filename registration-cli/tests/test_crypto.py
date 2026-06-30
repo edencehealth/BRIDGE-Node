@@ -42,3 +42,20 @@ def test_creates_parent_directory(tmp_path):
     key_path = tmp_path / "nested" / ".ssh" / "id_rsa"
     crypto.generate_ssh_key_if_missing(key_path)
     assert key_path.exists()
+
+
+def test_existing_private_key_not_overwritten_when_public_missing(tmp_path):
+    key_path = tmp_path / "id_rsa"
+    first_pub = crypto.generate_ssh_key_if_missing(key_path)
+    private_before = key_path.read_bytes()
+
+    # Simulate a lost/removed public key file
+    key_path.with_suffix(".pub").unlink()
+
+    second_pub = crypto.generate_ssh_key_if_missing(key_path)
+
+    # Private key must NOT be regenerated/overwritten
+    assert key_path.read_bytes() == private_before
+    # Public key restored, derived from the existing private key
+    assert key_path.with_suffix(".pub").exists()
+    assert second_pub == first_pub

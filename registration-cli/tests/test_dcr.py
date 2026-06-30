@@ -59,3 +59,14 @@ def test_register_oidc_client_malformed_201_raises_dcr_error(mock_post):
     with pytest.raises(dcr.DcrError) as exc:
         dcr.register_oidc_client(DCR_URL, "iat-123", "bridge-node-Test")
     assert "client_secret" in str(exc.value)
+
+
+@patch("registration_cli.dcr.requests.post")
+def test_register_oidc_client_non_json_201_raises_dcr_error(mock_post):
+    resp = MagicMock(status_code=201)
+    resp.json.side_effect = ValueError("Expecting value")
+    mock_post.return_value = resp
+
+    with pytest.raises(dcr.DcrError) as exc:
+        dcr.register_oidc_client(DCR_URL, "iat", "bridge-node-Test")
+    assert "non-JSON" in str(exc.value)
