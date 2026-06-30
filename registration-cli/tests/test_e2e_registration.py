@@ -49,6 +49,17 @@ def _e2e_env() -> _E2EConfig:
     if missing:
         pytest.skip(f"Missing required E2E env vars: {', '.join(missing)}")
 
+    endpoint_defaults_used = [
+        name for name in ("BRIDGE_E2E_API_URL", "BRIDGE_E2E_TOKEN_URL", "BRIDGE_E2E_DCR_URL")
+        if not os.environ.get(name)
+    ]
+    if endpoint_defaults_used:
+        warnings.warn(
+            "E2E using PRODUCTION endpoint default(s) for: "
+            + ", ".join(endpoint_defaults_used)
+            + ". Set these env vars to target a non-production environment."
+        )
+
     return _E2EConfig(
         keycloak_base_url=values["keycloak_base_url"],
         realm=os.environ.get("BRIDGE_E2E_REALM", "BRIDGE"),
@@ -101,10 +112,10 @@ def test_register_flow_end_to_end_with_single_use_iat(tmp_path):
 
     # 3. DCR: register a confidential OIDC client at live Keycloak
     creds = dcr.register_oidc_client(env.dcr_url, iat, f"bridge-node-e2e-{suffix}")
-    assert creds.client_id
-    assert creds.client_secret
-
     try:
+        assert creds.client_id
+        assert creds.client_secret
+
         # 4. Register the site at the BRIDGE API (assertion boundary)
         client = RegistrationClient(
             api_url=env.api_url,
