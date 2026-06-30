@@ -10,8 +10,9 @@ LOG_FILE = CONFIG_DIR / "bridge-node-registration.log"
 
 # Default settings
 DEFAULTS = {
-    "api_url": "https://portal.bridge.cloud.edence.health//api/v1/register",
-    "oidc_token_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/protocol/openid-connect/token"
+    "api_url": "https://portal.bridge.cloud.edence.health/api/v1/register",
+    "oidc_token_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/protocol/openid-connect/token",
+    "dcr_url": "https://keycloak.bridge.cloud.edence.health/realms/BRIDGE/clients-registrations/openid-connect",
 }
 
 def load_config() -> Dict[str, str]:

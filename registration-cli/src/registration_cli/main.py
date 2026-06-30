@@ -35,14 +35,16 @@ def main(verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable deb
 def configure(
         api_url: str = typer.Option(None, help="Set Registration API URL"),
         token_url: str = typer.Option(None, help="Set OIDC Token URL"),
+        dcr_url: str = typer.Option(None, help="Set Keycloak DCR URL"),
 ):
     """
     Update configuration settings.
     """
-    if not api_url and not token_url:
+    if not api_url and not token_url and not dcr_url:
         console.print(Panel("🔧 Configuration Setup", style="bold cyan", box=box.ROUNDED))
         api_url = typer.prompt("Registration API URL", default=APP_CONFIG.get("api_url"))
         token_url = typer.prompt("OIDC Token URL", default=APP_CONFIG.get("oidc_token_url"))
+        dcr_url = typer.prompt("Keycloak DCR URL", default=APP_CONFIG.get("dcr_url"))
 
     if api_url:
         config.save_config_value("api_url", api_url)
@@ -51,6 +53,10 @@ def configure(
     if token_url:
         config.save_config_value("oidc_token_url", token_url)
         logging.info(f"Updated Token URL to: {token_url}")
+
+    if dcr_url:
+        config.save_config_value("dcr_url", dcr_url)
+        logging.info(f"Updated DCR URL to: {dcr_url}")
 
     console.print(f"[green]✔[/green] Configuration saved to [dim]{config.CONFIG_FILE}[/dim]")
 
