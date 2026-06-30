@@ -67,7 +67,7 @@ prompt_required BRIDGE_E2E_KEYCLOAK_BASE_URL "Keycloak base URL" "https://keyclo
 default_admin_token_url="${BRIDGE_E2E_KEYCLOAK_BASE_URL%/}/realms/BRIDGE/protocol/openid-connect/token"
 
 prompt_required BRIDGE_E2E_ADMIN_TOKEN_URL   "Keycloak admin token URL" "$default_admin_token_url"
-prompt_required BRIDGE_E2E_ADMIN_CLIENT_ID   "Keycloak admin client ID"
+prompt_required BRIDGE_E2E_ADMIN_CLIENT_ID   "Keycloak admin client ID" "bridge-e2e-admin"
 prompt_required BRIDGE_E2E_ADMIN_CLIENT_SECRET "Keycloak admin client secret" "" secret
 
 echo "[INFO] Optional overrides (export before running to target non-production):"
