@@ -3,3 +3,7 @@
 .python-version
 .idea
 *__pycache__
+
+# Local-only Claude Code artifacts (not pushed to GitHub)
+CLAUDE.md
+docs/superpowers/
