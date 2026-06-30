@@ -39,3 +39,21 @@ def test_saved_file_is_owner_only(tmp_path, monkeypatch):
     credentials.save(CREDS)
     mode = stat.S_IMODE((cfg_dir / "node-credentials.json").stat().st_mode)
     assert mode == 0o600
+
+
+def test_repr_and_str_mask_secrets_but_dump_does_not():
+    creds = IssuedClientCredentials(
+        client_id="cid",
+        client_secret="SECRETVALUE",
+        registration_access_token="TOKENVALUE",
+        registration_client_uri="https://kc.example/clients/cid",
+    )
+    for rendered in (repr(creds), str(creds)):
+        assert "SECRETVALUE" not in rendered
+        assert "TOKENVALUE" not in rendered
+        assert "cid" in rendered  # non-secret fields still visible
+        assert "***" in rendered
+    # Persistence must still serialize the real secret values.
+    dumped = creds.model_dump_json()
+    assert "SECRETVALUE" in dumped
+    assert "TOKENVALUE" in dumped
