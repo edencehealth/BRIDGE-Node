@@ -26,7 +26,7 @@ echo "[INFO] Launching BRIDGE Node Registration App..."
 uv run --project registration-cli python -m registration_cli.main register
 
 # Install docker and related packages if not found
-if ! command -v docker &>/ /dev/null; then
+if ! command -v docker &> /dev/null; then
     echo "[INFO] Installing and setting up docker and related packages..."
     # Add Docker's official GPG key:
     sudo apt-get update && sudo apt upgrade -y
@@ -52,7 +52,7 @@ sudo usermod -aG docker $USER
 sudo systemctl enable docker
 
 # Install ssh
-if ! command -v openssh-server &>/ /dev/null; then
+if ! command -v sshd &> /dev/null; then
     echo "[INFO] Installing necessary packages..."
     sudo apt-get install -y openssh-server
     sudo service ssh restart
